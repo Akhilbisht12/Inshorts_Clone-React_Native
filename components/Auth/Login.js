@@ -1,39 +1,50 @@
 import React, { useState } from 'react';
-import { Text, View, TextInput, Button, AsyncStorage, ActivityIndicator } from 'react-native';
+import { Text, View, TextInput, Button, AsyncStorage, ActivityIndicator, Dimensions, TouchableOpacity } from 'react-native';
+
+const {height, width} = Dimensions.get('window');
 
 export default function Details({ navigation }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] =useState('');
   const [loading, setLoading] = useState(false);
 
-  const UserLoginFunction = () => {
+  const UserLoginFunction = async() => {
     setLoading(true);
-    fetch('https://www.upgrate.in/doonlocal/userLogin.php', {
+    fetch('https://doonlocalapi.herokuapp.com/login', {
       method: 'POST',
       headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
+        'Accept' : 'application/json',
+        'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        email: email,
-        password: password
+        "email": email,
+        "password": password
       }),
     })
-      .then(response => response.json())
-      .then((responseJson) => {
+      .then(response => {
         setLoading(false);
-        // If server response message same as Data Matched
-        if (responseJson === 'Data Matched') {
-          // save user to async
-          // AsyncStorage.setItem('isLoggedIn', true);
-
-          //Then open Profile activity and send user email to profile activity.
+        if(response.status === 201){
+          AsyncStorage.setItem('isLoggedIn', 'true');
           navigation.navigate('flatlist');
-        } else {
-          alert(responseJson);
-          console.log(responseJson)
+        }else{
+          alert('Invalid Credentials')
         }
       })
+      // .then((responseJson) => {
+      //   console.log(responseJson);
+      //   setLoading(false);
+      //   // If server response message same as Data Matched
+      //   if (responseJson === 'success') {
+      //     // save user to async
+      //     // AsyncStorage.setItem('isLoggedIn', true);
+
+      //     //Then open Profile activity and send user email to profile activity.
+      //     navigation.navigate('flatlist');
+      //   } else {
+      //     alert(responseJson);
+      //     console.log(responseJson)
+      //   }
+      // })
       .catch((error) => {
         setLoading(false);
         console.log(error);
@@ -47,7 +58,8 @@ export default function Details({ navigation }) {
   }else{
   return (
     <View style={styles.loginContainer}>
-      <Text style={styles.loginHead}>Login</Text>
+      <View style={styles.inputContainer}>
+      <Text style={styles.loginTitle}>Login</Text>
       <TextInput
         style={styles.textInput}
         placeholder="Email"
@@ -60,32 +72,76 @@ export default function Details({ navigation }) {
         onChangeText={(text) => setPassword(text)}
         value={password}
       />
-      <Button title="Submit" onPress={UserLoginFunction} />
-      <Button title="SignUp" onPress={() => navigation.navigate('SignUp')} />
-      <Button title="Skip this" onPress={() => navigation.navigate('flatlist')} />
+      </View>
+      <View style={styles.bottomContainer}>
+        <View style={styles.signbuttons}>
+          <TouchableOpacity  style={styles.buttons} onPress={UserLoginFunction}>
+            <Text style={styles.buttonText}>Sign In</Text>
+          </TouchableOpacity>
+          <TouchableOpacity  style={styles.buttons} onPress={() => navigation.navigate('SignUp')}>
+            <Text style={styles.buttonText}>Sign Up</Text>
+          </TouchableOpacity>
+        </View>
+        <TouchableOpacity onPress={() => navigation.navigate('flatlist')}>
+            <Text style={{textAlign:'center', marginBottom: 50}}>Don't Want to login. Skip</Text>
+          </TouchableOpacity>
+      </View>
     </View>
   );
   }
 }
 const styles = {
-  loginHead: {
-    fontSize: 20,
-    fontWeight: '500',
+  loginContainer : {
+    height : height,
+    width : width,
   },
 
-  loginContainer: {
-    flex: 1,
-    flexDirection: 'column',
-    justifyContent: 'center',
-    alignItems: 'center',
+  inputContainer : {
+    height : height*2/3,
+    width : width,
+    justifyContent : 'center',
+    paddingHorizontal : 50,
+    backgroundColor : '#1b1b1b',
+    borderBottomRightRadius : 15,
+    borderBottomLeftRadius : 15
   },
 
-  textInput: {
-    height: 5 + '%',
-    width: 80 + '%',
-    borderWidth: 1,
-    borderColor: 'black',
-    paddingHorizontal: 5,
-    marginVertical: 5,
+  loginTitle : {
+    fontSize : 30,
+    color : 'white',
+    marginVertical : 30,
+  },
+
+  textInput : {
+    height : 40,
+    borderBottomWidth : 1,
+    borderColor : 'white',
+    color : 'white',
+    marginVertical : 10
+  },
+
+  bottomContainer :{
+    height : height/3,
+    justifyContent : 'space-between'
+  },
+
+  signbuttons : {
+    display : 'flex',
+    flexDirection : 'row',
+    justifyContent : 'space-between',
+    paddingHorizontal : 60,
+    marginTop : -20
+  },
+
+  buttons : {
+    paddingHorizontal : 30,
+    paddingVertical : 10,
+    borderRadius : 20,
+    backgroundColor : 'black',
+  },
+
+  buttonText : {
+    fontSize : 20,
+    color : 'white'
   }
 };

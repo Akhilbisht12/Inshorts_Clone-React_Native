@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { SafeAreaView, FlatList, Dimensions, ActivityIndicator } from 'react-native';
+import { SafeAreaView, FlatList, Dimensions,Text, ActivityIndicator, AsyncStorage, View } from 'react-native';
 // import DATA from '../../assets/DATA';
 import axios from 'axios';
 import Item from './Item';
@@ -11,10 +11,11 @@ const FlatListItem = () => {
   const [ DATA, setDATA] = useState([]);
 
   useEffect(()=>{
-    fetch('https://upgrate.in/doonlocal/fetchapi.php')
+    console.log(AsyncStorage.getItem('isLoggedIn'));
+    fetch('https://doonlocalapi.herokuapp.com/fetchapi')
     .then((response)=>response.json())
     .then((responseJson)=>{
-      setDATA(responseJson.data);
+      setDATA(responseJson);
       setLoading(false);
       console.log(responseJson)
     })
@@ -35,10 +36,15 @@ const FlatListItem = () => {
   );
 
   if(loading){
-    return <ActivityIndicator style={{flex: 1,
+    return (
+    <View style={{flex: 1,
       flexDirection: 'column',
       justifyContent: 'center',
-      alignItems: 'center',}}/>
+      alignItems: 'center',}}>
+        <Text style={{textAlign : 'center', marginVertical : 20}}>Stories Are Being Loaded</Text>
+      <ActivityIndicator />
+    </View>
+    )
   }else{
     console.log(DATA)
   return (
@@ -49,7 +55,7 @@ const FlatListItem = () => {
         pagingEnabled
         scrollEventThrottle={20}
         showsVerticalScrollIndicator = {false}
-        keyExtractor={item => item.id}
+        keyExtractor={item => item._id}
       />
     </SafeAreaView>
   );

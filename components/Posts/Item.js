@@ -4,6 +4,7 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import { useNavigation } from '@react-navigation/native';
 import ViewShot from "react-native-view-shot";
 import * as Sharing from 'expo-sharing';
+import { TouchableOpacity } from 'react-native-gesture-handler';
 
 
 
@@ -60,20 +61,26 @@ const Item = ({ item }) => {
 return(
     <ViewShot ref={shotref}
     options={{format:'jpg', quality : 0.9}}>
-    <View style={styles.item}>
-      <Image style={{height:height/3, width:width}} source={{uri:item.imageLink}}/>
-      <View style={styles.text}>
-        <Text style={styles.title}>{item.heading}</Text>
-        <Text style={styles.summary}>{item.summary}</Text>
-      </View>
-      <View style={styles.reactions}>
-        <View style={{flexDirection:'row', alignItems:'center'}}>
-          <Icon style={styles.icon} name="thumbs-up" size={30} color={thumbsup} onPress={forVote}/>
-          <Icon style={styles.icon} name="thumbs-down" size={30} color={thumbsdown} onPress={againstVote} />
-          <Icon style={styles.icon} name="bullhorn" size={30} color="grey" onPress={captureAndShareScreenshot}/>
+    <View style={styles.mainContainer}>
+      <Image style={{height:height/2-20, width:width}} source={{uri:item.imglink}}/>
+      <View style={styles.textContainer}>
+        <View style={styles.iconshare}>
+          <Icon name="share" size={30} color="black" onPress={captureAndShareScreenshot}/>
         </View>
-        <View>
-          <Icon name="book" size={30} color="grey" onPress={()=>navigation.navigate('Web', { refLink: item.refLink })}/>
+        <View style={styles.text}>
+          <Text style={styles.title}>{item.heading}</Text>
+          <Text style={styles.summary}>{item.summary}</Text>
+        </View>
+        <View style={styles.reactions}>
+          <View style={{flexDirection:'row', alignItems:'center' , marginTop : 5}}>
+            <Icon style={styles.icon} name="arrow-up" size={30} color={thumbsup} onPress={forVote}/>
+            <Icon style={styles.icon} name="arrow-down" size={30} color={thumbsdown} onPress={againstVote} />
+          </View>
+          <View>
+            <TouchableOpacity style={styles.readbtn} onPress={()=>navigation.navigate('Web', { refLink: item.reflink })}>
+              <Text style={{color: 'white', fontSize:15}}>Read More</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
     </View>
@@ -82,30 +89,56 @@ return(
 };
 
   const styles = StyleSheet.create({
-    
-    item: {
+    mainContainer : {
+      height : height-StatusBar.currentHeight,
+      width : width
+    },
+    textContainer : {
+      height : height/2 + 20,
+      marginTop : -20,
+      borderTopLeftRadius : 25,
+      borderTopRightRadius : 25,
+      padding : 20,
       backgroundColor: 'white',
-      height : height- StatusBar.currentHeight,
-      width:width
+      justifyContent : 'space-between',
+      paddingBottom : 20
     },
-    title: {
-      fontSize: 30,
-    },
-    text: {
-      padding : 10,
-      height : 2/3*height - 80
-    },
-    summary : {
+    title : {
+      fontWeight : 'bold',
       fontSize : 20
     },
-    reactions:{
-      padding : 10,
-      flexDirection:'row',
-      justifyContent:'space-between',
-      height : 50
+    summary : {
+      fontSize : 18,
+      lineHeight : 30,
+      marginTop : 10
     },
-    icon:{
-      marginHorizontal: 5,
+    iconshare : {
+      justifyContent : 'center',
+      alignItems :'center',
+      position :'absolute',
+      top : -25,
+      right : 50,
+      height : 50,
+      width : 50,
+      borderRadius : 50,
+      padding : 5,
+      backgroundColor : 'white',
+      borderColor : 'black',
+      borderWidth : 1 
+    },
+    icon : {
+      marginHorizontal : 2
+    },
+    reactions : {
+      flexDirection : 'row',
+      alignItems : 'center',
+      justifyContent: 'space-between'
+    },
+    readbtn : {
+      backgroundColor : 'black',
+      paddingHorizontal : 10,
+      paddingVertical : 5,
+      borderRadius : 20
     }
   });
 
